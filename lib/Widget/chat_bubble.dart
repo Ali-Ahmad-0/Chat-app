@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 class ChatBubble extends StatelessWidget {
   const ChatBubble(
       {super.key,
+      required this.email,
       required this.messageModel,
       required this.messageId, // Add this line
       required this.messageTime,
@@ -17,7 +18,7 @@ class ChatBubble extends StatelessWidget {
   final String messageId; // Add this line
   final String messageTime;
   final bool isSender;
-
+  final String email;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -36,19 +37,27 @@ class ChatBubble extends StatelessWidget {
                 ),
                 // Alert Dialog
                 AlertDialog(
-                  backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                  backgroundColor: kPrimaryColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15),
                   ),
-                  title: const Text('Delete Message'),
+                  title: const Text(
+                    'Delete Message',
+                    style: TextStyle(color: Colors.white),
+                  ),
                   content: const Text(
-                      'Are you sure you want to delete this message?'),
+                    'Are you sure you want to delete this message?',
+                    style: TextStyle(color: Colors.white),
+                  ),
                   actions: [
                     TextButton(
                       onPressed: () {
                         Navigator.of(context).pop(); // Close the dialog
                       },
-                      child: const Text('Cancel'),
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                     TextButton(
                       onPressed: () {
@@ -86,6 +95,11 @@ class ChatBubble extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
+              Text(
+                email,
+                style: const TextStyle(color: Colors.white, fontSize: 12),
+                softWrap: true,
+              ),
               Text(
                 messageModel.message,
                 style: const TextStyle(color: Colors.white, fontSize: 18),

@@ -7,10 +7,12 @@ class CustomTextFormField extends StatelessWidget {
       required this.onChanged,
       required this.secured,
       this.textHint,
+      this.sufIcon,
       required this.icon});
   String? textHint;
   Function(String)? onChanged;
   final Icon? icon;
+  final Icon? sufIcon;
   bool? secured;
   @override
   Widget build(BuildContext context) {
@@ -24,20 +26,23 @@ class CustomTextFormField extends StatelessWidget {
       },
       style: const TextStyle(
         color: Colors.white,
+        
       ),
+      cursorColor: Colors.white,
       onChanged: onChanged,
       decoration: InputDecoration(
         prefixIcon: icon,
+        suffixIcon: sufIcon,
         hintText: textHint,
         focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(color: Colors.white)),
         hintStyle: const TextStyle(color: Colors.white),
         enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(color: Colors.white)),
         border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(12),
             borderSide: const BorderSide(color: Colors.white)),
       ),
     );

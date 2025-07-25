@@ -39,34 +39,24 @@ class _LoginState extends State<Login> {
                   height: 100,
                 ),
                 const SizedBox(
-                  height: 75,
+                  width: double.infinity,
+                  height: 60,
                 ),
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Scholar app",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 40,
-                          fontFamily: 'Pacifico'),
-                    ),
-                  ],
+                const Text(
+                  textAlign: TextAlign.center,
+                  "Scholar chat",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 40,
+                      fontFamily: 'pacifico'),
                 ),
-
                 const SizedBox(
                   height: 50,
                 ),
-                const Row(
-                  children: [
-                    Text(
-                      "Login",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 23,
-                      ),
-                    ),
-                  ],
+                const Text(
+                  "Login",
+                  style: TextStyle(
+                      color: Colors.white, fontSize: 23, fontFamily: 'times'),
                 ),
                 const SizedBox(
                   height: 20,
@@ -86,6 +76,10 @@ class _LoginState extends State<Login> {
                   height: 10,
                 ),
                 CustomTextFormField(
+                  sufIcon: Icon(
+                    Icons.remove_red_eye,
+                    color: Colors.white,
+                  ),
                   secured: true,
                   onChanged: (value) {
                     password = value;

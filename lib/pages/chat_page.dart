@@ -17,14 +17,14 @@ class _ChatPageState extends State<ChatPage> {
   CollectionReference messages =
       FirebaseFirestore.instance.collection(Kmessage);
   TextEditingController controller = TextEditingController();
-  final ScrollController _controller = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
     var email = ModalRoute.of(context)!.settings.arguments;
     return StreamBuilder<QuerySnapshot>(
-      stream: messages.orderBy(Kcreate, descending: false).snapshots() ,
-      builder: (context, snapshot ) {
+      stream: messages.orderBy(Kcreate, descending: false).snapshots(),
+      builder: (context, snapshot) {
         if (snapshot.hasData) {
           List<MessageModel> messageList = [];
           List<String> messageTimes = []; // List to store message times
@@ -35,8 +35,8 @@ class _ChatPageState extends State<ChatPage> {
 
             // Convert Firestore Timestamp to a readable format
             // Safely check if createdAt is not null before converting
-            Timestamp? timestamp = data[Kcreate] as Timestamp?;
-            DateTime dateTime = timestamp?.toDate() ?? DateTime.now();
+            // Timestamp? timestamp = data[Kcreate] as Timestamp?;
+            DateTime dateTime = data[Kcreate].toDate() ?? DateTime.now();
             String formattedTime = "${dateTime.hour}:${dateTime.minute}";
             messageTimes.add(formattedTime);
           }
@@ -60,83 +60,95 @@ class _ChatPageState extends State<ChatPage> {
                 ],
               ),
             ),
-            body: Column(
+            body: Stack(
               children: [
-                const SizedBox(
-                  height: 10,
+                Image.asset(
+                  'assets/images/doodle-seo-icons-backgrround-business-backdrop-hand-drow-sketchy-pattern-notepaper-wallpaper-background-vector-45587472.webp',
+                  height: double.infinity,
+                  fit: BoxFit.cover,
                 ),
-                Expanded(
-                  child: ListView.builder(
-                    reverse: false,
-                    controller: _controller,
-                    itemCount: messageList.length,
-                    itemBuilder: (context, index) {
-                      return messageList[index].id == email
-                          ? ChatBubble(
-                              isSender: true,
-
-                              messageModel: messageList[index],
-                              messageId: snapshot
-                                  .data!.docs[index].id, // Pass the message ID
-                              messageTime: messageTimes[index],
-                            )
-                          : ChatBubble(
-                              isSender: false,
-                              messageModel: messageList[index],
-                              messageId: snapshot
-                                  .data!.docs[index].id, // Pass the message ID
-                              messageTime: messageTimes[index],
-                            );
-                    },
-                  ),
-                ),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 15),
-                  child: TextField(
-                    controller: controller,
-                    onSubmitted: (data) {
-                      messages.add({
-                        'text': data,
-                        'createdAt': FieldValue
-                            .serverTimestamp(), // Use server timestamp
-                        'id': email
-                      });
-
-                      _controller.animateTo(0,
-                          duration: const Duration(seconds: 1),
-                          curve: Curves.ease);
-
-                      controller.clear();
-                    },
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      suffixIcon: GestureDetector(
-                        onTap: () {
-                          if (controller.text.isNotEmpty) {
-                            messages.add({
-                              'text': controller.text,
-                              'createdAt': FieldValue
-                                  .serverTimestamp(), // Use server timestamp
-                            });
-                            _controller.animateTo(
-                                _controller.position.maxScrollExtent,
-                                duration: const Duration(milliseconds: 250),
-                                curve: Curves.ease);
-
-                            controller.clear();
-                          } else {}
+                Column(
+                  children: [
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Expanded(
+                      child: ListView.builder(
+                        reverse: false,
+                        controller: _scrollController,
+                        itemCount: messageList.length,
+                        itemBuilder: (context, index) {
+                          return messageList[index].id == email
+                              ? ChatBubble(
+                                  isSender: false,
+                                  email: email.toString(),
+                                  messageModel: messageList[index],
+                                  messageId: snapshot.data!.docs[index]
+                                      .id, // Pass the message ID
+                                  messageTime: messageTimes[index],
+                                )
+                              : ChatBubble(
+                                  email: email.toString(),
+                                  isSender: true,
+                                  messageModel: messageList[index],
+                                  messageId: snapshot.data!.docs[index]
+                                      .id, // Pass the message ID
+                                  messageTime: messageTimes[index],
+                                );
                         },
-                        child: Icon(
-                          Icons.send_rounded,
-                          color: kPrimaryColor,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 5, horizontal: 10),
+                      child: TextField(
+                        controller: controller,
+                        onSubmitted: (data) {
+                          messages.add({
+                            'text': data,
+                            'createdAt': FieldValue
+                                .serverTimestamp(), // Use server timestamp
+                            'id': email
+                          });
+
+                          // _scrollController.animateTo(0,
+                          //     duration: const Duration(seconds: 1),
+                          //     curve: Curves.ease);
+
+                          controller.clear();
+                        },
+                        decoration: InputDecoration(
+                          fillColor: Colors.white,
+                          filled: true,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          suffixIcon: GestureDetector(
+                            onTap: () {
+                              if (controller.text.isNotEmpty) {
+                                messages.add({
+                                  'text': controller.text,
+                                  'createdAt': FieldValue
+                                      .serverTimestamp(), // Use server timestamp
+                                });
+                                _scrollController.animateTo(
+                                    _scrollController.position.maxScrollExtent,
+                                    duration: const Duration(milliseconds: 250),
+                                    curve: Curves.ease);
+
+                                controller.clear();
+                              } else {}
+                            },
+                            child: Icon(
+                              Icons.send_rounded,
+                              color: kPrimaryColor,
+                            ),
+                          ),
+                          hintText: 'Write a message ...',
                         ),
                       ),
-                      hintText: 'Write a message ...',
                     ),
-                  ),
+                  ],
                 ),
               ],
             ),
