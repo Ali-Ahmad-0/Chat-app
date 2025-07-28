@@ -1,7 +1,7 @@
 import 'package:chat/Widget/customTextField.dart';
 import 'package:chat/Widget/custom_button.dart';
 import 'package:chat/constants.dart';
-import 'package:chat/cubits/cubit/login_cubit.dart';
+import 'package:chat/cubits/login_cubit/login_cubit.dart';
 import 'package:chat/helper/showSnackBar.dart';
 import 'package:chat/pages/chat_page.dart';
 import 'package:chat/pages/register.dart';
@@ -16,6 +16,12 @@ class Login extends StatelessWidget {
   String? email, password;
   bool isLoading = false;
   GlobalKey<FormState> formKey = GlobalKey();
+
+  Future<void> loginUser() async {
+    UserCredential user = await FirebaseAuth.instance
+        .signInWithEmailAndPassword(email: email!, password: password!);
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<LoginCubit, LoginState>(
@@ -23,9 +29,11 @@ class Login extends StatelessWidget {
         if (state is LoginLoading) {
           isLoading = true;
         } else if (state is LoginFailure) {
-          ShowSnackBar(context, 'there is something went wrong !');
+          ShowSnackBar(context, state.errorMesage);
+          isLoading = false;
         } else if (state is LoginSuccess) {
           Navigator.pushNamed(context, ChatPage.id, arguments: email);
+          isLoading = false;
         }
       },
       child: ModalProgressHUD(
@@ -38,7 +46,6 @@ class Login extends StatelessWidget {
               key: formKey,
               child: ListView(
                 children: [
-                  // ignore: prefer_const_constructors
                   const SizedBox(
                     height: 75,
                   ),
@@ -84,7 +91,7 @@ class Login extends StatelessWidget {
                     height: 10,
                   ),
                   CustomTextFormField(
-                    sufIcon: Icon(
+                    sufIcon: const Icon(
                       Icons.remove_red_eye,
                       color: Colors.white,
                     ),
@@ -108,27 +115,8 @@ class Login extends StatelessWidget {
                     buttonContent: 'Login',
                     onTap: () async {
                       if (formKey.currentState!.validate()) {
-                        isLoading = true;
-                        try {
-                          await FirebaseAuth.instance
-                              .signInWithEmailAndPassword(
-                                  email: email!, password: password!);
-
-                          Navigator.pushNamed(context, ChatPage.id,
-                              arguments: email);
-                        } on FirebaseAuthException catch (e) {
-                          if (e.code == 'user-not-found') {
-                            ShowSnackBar(context,
-                                'This user is not exist , Try to sign up ⛔');
-                          } else if (e.code == 'wrong-password') {
-                            ShowSnackBar(context, 'Wrong password ⛔');
-                          }
-                        } catch (e) {
-                          ShowSnackBar(context,
-                              'There is something went wrong , please try again later !');
-                          print(e);
-                        }
-                        isLoading = false;
+                        BlocProvider.of<LoginCubit>(context)
+                            .loginUser(email: email!, password: password!);
                       } else {}
                     },
                   ),
